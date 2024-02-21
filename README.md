@@ -1,1 +1,2 @@
-work in progress. a desktop widget set for fltk-rs
+# Overview
+A highly opinionated toolkit for creating desktop apps using fltk-rs
