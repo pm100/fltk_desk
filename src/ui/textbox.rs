@@ -8,7 +8,11 @@ use fltk::{
     widget::Widget,
 };
 
-use super::{control::Control, misc::Theme};
+use super::{
+    application::{ApplicationExt, ApplicationPtr},
+    control::Control,
+    misc::{ Theme},
+};
 
 pub struct TextBoxx<Message>
 where
@@ -60,21 +64,26 @@ where
     }
 }
 #[derive(Clone)]
-pub struct TextBox {
+pub struct TextBox<TM: Send + Sync + 'static> {
     text: HoldBrowser,
-    theme: &'static Theme,
+    //theme: &'static Theme,
+    app: ApplicationPtr<TM>,
 }
 
-impl TextBox {
-    pub fn new(size: Rect, theme: &'static Theme) -> Self {
+impl<TM: Send + Sync + 'static> TextBox<TM> {
+    pub fn new(size: Rect, app: &ApplicationPtr<TM>) -> Self {
         Group::set_current(None::<&Group>);
-        let mut text = HoldBrowser::new(size.x, size.y, size.w, size.h, "");
+        let mut text = HoldBrowser::new(size.x, size.y, size.w, size.h, None);
+        let theme = app.get_theme();
         text.set_color(theme.bg);
         text.set_selection_color(theme.hl);
 
         text.set_text_size(theme.mono_font_size);
         text.set_frame(FrameType::FlatBox);
-        let s = Self { text, theme };
+        let s = Self {
+            text,
+            app: app.clone(),
+        };
         s
     }
     pub fn clear(&mut self) {
@@ -82,17 +91,21 @@ impl TextBox {
     }
 
     pub fn append(&mut self, text: &str) {
+        let theme = &self.app.get_theme();
         let line = format!(
             "@C{}@F{}@S{}@.{}",
-            self.theme.fg.bits(),
-            self.theme.font.bits(),
-            self.theme.font_size,
+            theme.fg.bits(),
+            theme.font.bits(),
+            theme.font_size,
             text
         );
         self.text.add(&line);
     }
 }
-impl Control for TextBox {
+impl<TM> Control<TM> for TextBox<TM>
+where
+    TM: Send + Sync + Clone + 'static,
+{
     fn fl_widget(&self) -> Widget {
         let x = unsafe {
             Widget::from_widget_ptr(self.text.as_widget_ptr() as *mut fltk_sys::widget::Fl_Widget)

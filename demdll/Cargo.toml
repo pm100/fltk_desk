@@ -1,15 +1,11 @@
-workspace = { members = [ "demdll","demo", "treedem"] }
 [package]
-name = "fltk_desk"
+name = "demdll"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
+[lib]
+crate-type = ["cdylib"]
 [dependencies]
-anyhow = "1.0.80"
+fltk_desk={path=".."}
 fltk = { version = "1.4.24", features = ["fltk-bundled"] }
-fltk-sys = "1.4.23"
-crossbeam-channel = "0.5"
-
-

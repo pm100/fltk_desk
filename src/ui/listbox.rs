@@ -6,13 +6,18 @@ use fltk::{
     app::Sender,
     draw::Rect,
     enums::{Color, Event, Font},
+    group::Group,
     prelude::*,
     table::{TableRow, TableRowSelectMode},
     widget::Widget,
     *,
 };
 
-use super::{control::Control, misc::Theme};
+use super::{
+    application::{ApplicationExt, ApplicationPtr},
+    control::Control,
+    misc::Theme,
+};
 
 //use crate::cxapp::Message;
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -30,35 +35,44 @@ pub struct Row {
     pub tag: Option<String>,
 }
 #[derive(Clone)]
-pub struct ListBox
-//where
-//  Message: Send + Sync + Clone + 'static,
+pub struct ListBox<TM>
+where
+    TM: Send + Sync + Clone + 'static,
 {
     table: TableRow,
     rows: Arc<RefCell<Vec<Row>>>,
     cols: Rc<Vec<ColumnDefinition>>,
-    theme: &'static Theme,
-    //phantom: std::marker::PhantomData<Message>,
+    app: ApplicationPtr<TM>,
+    // theme: &'static Theme,
+    phantom: std::marker::PhantomData<TM>,
 }
 
-impl ListBox
-//where
-//  Message: Send + Sync + Clone + 'static,
+impl<TM> ListBox<TM>
+where
+    TM: Send + Sync + Clone + 'static,
 {
-    pub fn new(size: Rect, cols: &[ColumnDefinition], theme: &'static Theme) -> Self {
-        let mut table =
-            TableRow::new(size.x, size.y, size.w, size.h, "").with_type(TableRowSelectMode::Single);
-
+    pub fn new(size: Rect, cols: &[ColumnDefinition], app: &ApplicationPtr<TM>) -> Self {
+        Group::set_current(None::<&Group>);
+        let mut table = TableRow::new(size.x, size.y, size.w, size.h, None)
+            .with_type(TableRowSelectMode::Single);
+        table.handle(|m, e| {
+            println!("table event: {:?}, {:?},{:08x}", m, e, e.bits());
+            true
+        });
         table.set_rows(0);
         table.set_row_header(false);
         table.set_row_resize(false);
         table.set_cols(cols.len() as i32);
         table.set_col_header(true);
-        table.set_color(theme.bg);
+        table.set_color(app.get_theme().bg);
         table.set_col_header_height(25);
-        table.set_col_header_color(theme.frame_color);
+        table.set_col_header_color(app.get_theme().frame_color);
         table.set_row_height_all(20);
         table.set_col_resize(true);
+        table.set_callback(move |t| {
+            let (rt, _ct, _rb, _cb) = t.get_selection();
+            println!("table callback: {:?}", rt);
+        });
 
         for (i, col) in cols.iter().enumerate() {
             table.set_col_width(i as i32, col.width);
@@ -67,19 +81,20 @@ impl ListBox
             table,
             rows: Arc::default(),
             cols: Rc::new(cols.to_vec()),
-            // phantom: std::marker::PhantomData,
-            theme: theme,
+            phantom: std::marker::PhantomData,
+            app: app.clone(),
         };
 
         s.table.draw_cell({
             let cols = s.cols.clone();
             let rows = s.rows.clone();
+            let theme = s.app.get_theme().clone();
             move  |t, ctx, row, col, x, y, w, h| match ctx {
             table::TableContext::StartPage => {
-                draw::set_font(s.theme.font, s.theme.font_size as i32);
+                draw::set_font( theme.font, theme.font_size as i32);
             },
             table::TableContext::ColHeader => {
-                Self::draw_header(&cols,col, x, y, w, h, &s.theme)
+                Self::draw_header(&cols,col, x, y, w, h,  &theme)
             }
 
             table::TableContext::Cell => {
@@ -93,7 +108,7 @@ impl ListBox
                 w,
                 h,
                 sel,
-                s.theme
+                &theme
             )}
             , // Data in cells
             _ => (),
@@ -156,15 +171,26 @@ impl ListBox
         theme: &Theme,
     ) {
         draw::push_clip(x, y, w, h);
-        draw::draw_box(enums::FrameType::ThinUpBox, x, y, w, h, theme.frame_color);
+        // draw::draw_box(enums::FrameType::ThinUpBox, x, y, w, h, theme.bg);
         let txt = cols[col as usize].name.as_str();
+        // draw::set_draw_color(theme.fg);
+        draw::set_draw_color(theme.bg);
+        draw::draw_rectf(x, y, w, h);
         draw::set_draw_color(theme.fg);
         draw::set_font(theme.font, theme.font_size as i32);
-        draw::draw_text2(txt, x, y, w, h, enums::Align::Left);
+        draw::draw_text2(txt, x + 2, y, w, h, enums::Align::Left);
+
+        if col > 0 {
+            draw::draw_line(x, y, x, y + h)
+        };
+        if col == (cols.len() - 1) as i32 {
+            draw::draw_line(x + w - 1, y, (x + w) - 1, y + h)
+        };
         draw::pop_clip();
     }
     fn draw_data(txt: &str, x: i32, y: i32, w: i32, h: i32, selected: bool, theme: &Theme) {
         draw::push_clip(x, y, w, h);
+        //   println!("draw_data: {}, {}, {}, {}", x, y, w, h);
         if selected {
             draw::set_draw_color(theme.hl);
         } else {
@@ -173,12 +199,15 @@ impl ListBox
         draw::draw_rectf(x, y, w, h);
         draw::set_draw_color(theme.fg);
         draw::set_font(theme.font, theme.font_size as i32);
-        draw::draw_text2(txt, x, y, w, h, enums::Align::Left);
+        draw::draw_text2(txt, x + 2, y, w, h, enums::Align::Left);
         //  draw::draw_rect(x, y, w, h);
         draw::pop_clip();
     }
 }
-impl Control for ListBox {
+impl<TM> Control<TM> for ListBox<TM>
+where
+    TM: Send + Sync + Clone + 'static,
+{
     fn fl_widget(&self) -> Widget {
         let x = unsafe {
             Widget::from_widget_ptr(self.table.as_widget_ptr() as *mut fltk_sys::widget::Fl_Widget)
@@ -186,4 +215,3 @@ impl Control for ListBox {
         x
     }
 }
-
