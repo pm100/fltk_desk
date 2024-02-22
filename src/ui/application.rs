@@ -36,7 +36,7 @@ impl<T: Send + Sync + 'static> ApplicationExt<T> for Rc<RefCell<Application<T>>>
 }
 impl<T: 'static + Send + Sync> Application<T> {
     pub fn new(theme: Theme) -> ApplicationPtr<T> {
-        let app = app::App::default().with_scheme(app::Scheme::Gleam);
+        let app = app::App::default().with_scheme(app::Scheme::Gtk);
         let (sender, receiver) = app::channel::<T>();
         Rc::new(RefCell::new(Application {
             app,

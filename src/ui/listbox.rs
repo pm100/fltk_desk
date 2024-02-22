@@ -113,6 +113,24 @@ where
             , // Data in cells
             _ => (),
         }});
+        s.table.handle(|t, ev| match ev {
+            Event::Push => {
+                let ctx = t.callback_context();
+                match ctx {
+                    table::TableContext::Cell => {
+                        let (row_top, _, row_bot, _) = t.get_selection();
+                        let r = t.cols();
+                        t.set_selection(row_top, 0, row_bot, r);
+                    }
+                    table::TableContext::ColHeader => {
+                        t.set_selection(-1, -1, -1, -1);
+                    }
+                    _ => (),
+                }
+                true
+            }
+            _ => false,
+        });
         s.table.end();
         s
     }

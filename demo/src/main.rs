@@ -23,7 +23,7 @@ fn main() {
     let theme = Theme {
         bg: Color::Black,
         fg: Color::White,
-        hl: Color::Blue,
+        hl: Color::from_rgbi(35),
         frame_color: Color::Dark2,
         font: Font::Helvetica,
         font_size: 14,
@@ -31,7 +31,19 @@ fn main() {
         mono_font_size: 14,
         popbg: MyDark1,
     };
-    let app = Application::<Message>::new(theme);
+
+    let theme2 = Theme {
+        bg: Color::White,
+        fg: Color::Black,
+        hl: Color::from_rgbi(41),
+        frame_color: Color::Dark2,
+        font: Font::Helvetica,
+        font_size: 14,
+        mono_font: Font::Courier,
+        mono_font_size: 14,
+        popbg: Color::from_rgbi(48),
+    };
+    let app = Application::<Message>::new(theme2);
     let mut menu = Menu::new(&app);
     let mut window = MainWin::<Message>::new(
         Rect {

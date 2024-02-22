@@ -7,7 +7,7 @@ use fltk::{
     draw::Rect,
     enums::{Color, Event},
     prelude::{FltkError, WidgetBase, WidgetExt},
-    tree::{Tree, TreeItem, TreeReason},
+    tree::{Tree, TreeItem, TreeReason, TreeSelect},
     widget::Widget,
 };
 
@@ -54,13 +54,14 @@ impl<TM: Send + Sync + Clone + 'static> TreeView<TM> {
         let theme = app.get_theme();
         let pfr = Rc::clone(&previous_focus);
         let mut root = TreeItem::new(&tree, "Segments");
-        root.set_label_bgcolor(Color::Blue);
+        // tree.set_select_mode(TreeSelect::None);
+        // root.set_label_bgcolor(Color::Blue);
         root.set_label_color(Color::White);
         root.set_label_fgcolor(Color::Red);
         root.set_label_font(theme.font);
         root.set_label_size(theme.font_size);
         tree.set_root(Some(root));
-        tree.set_selection_color(theme.hl);
+        //tree.set_selection_color(theme.hl);
         tree.set_color(theme.bg);
         tree.set_item_label_fgcolor(theme.fg);
         tree.set_item_label_font(theme.font);

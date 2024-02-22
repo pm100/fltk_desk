@@ -28,6 +28,9 @@ impl<TM: Send + Sync + Clone + 'static> Menu<TM> {
         s.menu.set_color(app.get_theme().popbg);
         s.menu.set_text_color(app.get_theme().fg);
         s.menu.set_frame(FrameType::FlatBox);
+        s.menu.set_selection_color(app.get_theme().hl);
+
+        app::set_contrast_mode(app::ContrastMode::None);
         s
     }
     pub fn add(&mut self, label: &str, shortcut: fltk::enums::Shortcut, message: TM) {
