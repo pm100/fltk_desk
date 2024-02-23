@@ -11,7 +11,7 @@ use fltk::{
 use super::{
     application::{ApplicationExt, ApplicationPtr},
     control::Control,
-    misc::{ Theme},
+    misc::Theme,
 };
 
 pub struct TextBoxx<Message>
@@ -79,7 +79,7 @@ impl<TM: Send + Sync + 'static> TextBox<TM> {
         text.set_selection_color(theme.hl);
 
         text.set_text_size(theme.mono_font_size);
-        text.set_frame(FrameType::FlatBox);
+        text.set_frame(FrameType::DownBox);
         let s = Self {
             text,
             app: app.clone(),

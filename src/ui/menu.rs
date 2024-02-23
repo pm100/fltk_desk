@@ -16,8 +16,8 @@ pub struct Menu<TM: Send + Sync + Clone + 'static> {
     phantom: std::marker::PhantomData<TM>,
 }
 impl<TM: Send + Sync + Clone + 'static> Menu<TM> {
-    pub fn new(app: &ApplicationPtr<TM>) -> Self {
-        let mut menu = fltk::menu::SysMenuBar::default().with_size(800, 34);
+    pub fn new(app: &ApplicationPtr<TM>, height: i32) -> Self {
+        let mut menu = fltk::menu::SysMenuBar::default().with_size(800, height);
         let mut s = Self {
             app: app.clone(),
             menu,
@@ -30,7 +30,7 @@ impl<TM: Send + Sync + Clone + 'static> Menu<TM> {
         s.menu.set_frame(FrameType::FlatBox);
         s.menu.set_selection_color(app.get_theme().hl);
 
-        app::set_contrast_mode(app::ContrastMode::None);
+        // app::set_contrast_mode(app::ContrastMode::None);
         s
     }
     pub fn add(&mut self, label: &str, shortcut: fltk::enums::Shortcut, message: TM) {

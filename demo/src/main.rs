@@ -44,7 +44,9 @@ fn main() {
         popbg: Color::from_rgbi(48),
     };
     let app = Application::<Message>::new(theme2);
-    let mut menu = Menu::new(&app);
+    let height = if cfg!(target_os = "macos") { 0 } else { 34 };
+    println!("{}", height);
+    let mut menu = Menu::new(&app, height);
     let mut window = MainWin::<Message>::new(
         Rect {
             x: 0,
@@ -65,9 +67,9 @@ fn main() {
     let mut vsplitter = Splitter::<Message>::new(
         Rect {
             x: 0,
-            y: 34,
+            y: height,
             w: 800,
-            h: 600 - 34,
+            h: 600 - height,
         },
         &app,
         true,
@@ -75,9 +77,9 @@ fn main() {
     let mut hsplitter = Splitter::<Message>::new(
         Rect {
             x: 0,
-            y: 34,
+            y: height,
             w: 800,
-            h: 600 - 34,
+            h: 600 - height,
         },
         &app,
         false,
@@ -161,7 +163,17 @@ fn main() {
         println!("Received message: {:?}", msg);
         match msg {
             Message::Quit => true,
+            Message::LoadBinary => {
+                fltk::dialog::alert(center().0 - 200, center().1 - 100, "Please specify a file!");
+                false
+            }
             _ => false,
         }
     });
+}
+pub fn center() -> (i32, i32) {
+    (
+        (fltk::app::screen_size().0 / 2.0) as i32,
+        (fltk::app::screen_size().1 / 2.0) as i32,
+    )
 }
