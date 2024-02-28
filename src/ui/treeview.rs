@@ -5,7 +5,7 @@ use std::{cell::RefCell, rc::Rc};
 use fltk::{
     app,
     draw::Rect,
-    enums::{Color, Event},
+    enums::{Color, Event, FrameType},
     prelude::{FltkError, WidgetBase, WidgetExt},
     tree::{Tree, TreeItem, TreeReason, TreeSelect},
     widget::Widget,
@@ -55,8 +55,8 @@ impl<TM: Send + Sync + Clone + 'static> TreeView<TM> {
         let pfr = Rc::clone(&previous_focus);
         let mut root = TreeItem::new(&tree, "Segments");
         // tree.set_select_mode(TreeSelect::None);
-        // root.set_label_bgcolor(Color::Blue);
-        root.set_label_color(theme.fg);
+        root.set_label_bgcolor(Color::Blue);
+        root.set_label_color(theme.bg);
         root.set_label_fgcolor(theme.fg);
         root.set_label_font(theme.font);
         root.set_label_size(theme.font_size);
@@ -66,6 +66,7 @@ impl<TM: Send + Sync + Clone + 'static> TreeView<TM> {
         tree.set_item_label_fgcolor(theme.fg);
         tree.set_item_label_font(theme.font);
         tree.set_item_label_size(theme.font_size);
+        tree.set_frame(FrameType::DownBox);
         //tree.set_root_label("Segments");
 
         //tree.set_show_root(false);

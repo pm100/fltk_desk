@@ -67,6 +67,7 @@ where
         table.set_color(app.get_theme().bg);
         table.set_col_header_height(25);
         table.set_col_header_color(app.get_theme().frame_color);
+
         table.set_row_height_all(20);
         table.set_col_resize(true);
         table.set_callback(move |t| {
@@ -191,10 +192,10 @@ where
         draw::push_clip(x, y, w, h);
         // draw::draw_box(enums::FrameType::ThinUpBox, x, y, w, h, theme.bg);
         let txt = cols[col as usize].name.as_str();
-        // draw::set_draw_color(theme.fg);
+        draw::set_draw_color(theme.fg);
         draw::set_draw_color(theme.bg);
         draw::draw_rectf(x, y, w, h);
-        draw::set_draw_color(theme.fg);
+        draw::set_draw_color(theme.faint_text);
         draw::set_font(theme.font, theme.font_size as i32);
         draw::draw_text2(txt, x + 2, y, w, h, enums::Align::Left);
 

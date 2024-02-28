@@ -10,6 +10,7 @@ pub struct Theme {
     pub font_size: i32,
     pub mono_font: Font,
     pub mono_font_size: i32,
+    pub faint_text: Color,
 }
 // pub struct Environment<TM: Send + Sync + Clone + 'static> {
 //     pub theme: &'static Theme,

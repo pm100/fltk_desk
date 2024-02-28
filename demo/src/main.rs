@@ -1,4 +1,5 @@
 use fltk::{
+    app,
     draw::Rect,
     enums::{Color, Font, Shortcut},
 };
@@ -30,6 +31,7 @@ fn main() {
         mono_font: Font::Courier,
         mono_font_size: 14,
         popbg: MyDark1,
+        faint_text: Color::Dark3,
     };
 
     let theme2 = Theme {
@@ -42,7 +44,19 @@ fn main() {
         mono_font: Font::Courier,
         mono_font_size: 14,
         popbg: Color::from_rgbi(48),
+        faint_text: Color::from_rgbi(45),
     };
+    //let mut vcol = vec![];
+    // for i in 32..56 {
+    //     let c = Color::from_rgbi(i);
+    //     let rgb = c.to_rgb();
+    //     let oldc = Color::from_rgbi(32 + (56 - i));
+    //     println!("Color: {:?}, {:?}, {:?}, {:?}", oldc, rgb.0, rgb.1, rgb.2);
+    //     app::set_color(oldc, rgb.0, rgb.1, rgb.2);
+    // }
+    // app::set_color(Color::Black, 255, 255, 255);
+    // app::set_color(Color::White, 0, 0, 0);
+
     let app = Application::<Message>::new(theme2);
     let height = if cfg!(target_os = "macos") { 0 } else { 34 };
     println!("{}", height);
@@ -103,16 +117,16 @@ fn main() {
     let mut seglist = ListBox::<Message>::new(
         Rect {
             x: 0,
-            y: 34,
-            w: 400,
-            h: (600 - 34) / 2,
+            y: 0,
+            w: 0,
+            h: 0,
         },
         &cols,
         &app,
     );
 
     let r1 = Row {
-        cells: vec!["Name".to_string(), "Start".to_string(), "Size".to_string()],
+        cells: vec!["foo".to_string(), "wizz".to_string(), "bang".to_string()],
         tag: None,
     };
     let r2 = Row {
@@ -124,9 +138,9 @@ fn main() {
     let mut symlist = ListBox::<Message>::new(
         Rect {
             x: 0,
-            y: 34,
-            w: 400,
-            h: (600 - 34) / 2,
+            y: 0,
+            w: 0,
+            h: 0,
         },
         &cols,
         &app,
@@ -142,10 +156,10 @@ fn main() {
     );
     textbox.append("yo: 1\n");
 
-    hsplitter.add(&seglist);
-    hsplitter.add(&symlist);
-    vsplitter.add(&hsplitter);
-    vsplitter.add(&textbox);
+    hsplitter.add(&seglist, 60);
+    hsplitter.add(&symlist, 40);
+    vsplitter.add(&hsplitter, 20);
+    vsplitter.add(&textbox, 30);
     let mut tree = TreeView::<Message>::new(
         Rect {
             x: 0,
@@ -157,7 +171,7 @@ fn main() {
     );
     tree.add("a/b", Message::LoadBinary);
     tree.add("a/c", Message::MenuEditCut);
-    vsplitter.add(&tree);
+    vsplitter.add(&tree, 0);
     window.show();
     app.run(|msg| {
         println!("Received message: {:?}", msg);

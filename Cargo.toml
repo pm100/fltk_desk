@@ -1,4 +1,5 @@
-workspace = { members = [ "demdll","demo", "treedem"] }
+[workspace]
+members = [ "demdll","demo", "treedem"] 
 [package]
 name = "fltk_desk"
 version = "0.1.0"
@@ -6,10 +7,15 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
+[workspace.dependencies]
 anyhow = "1.0.80"
-fltk = { version = "1.4.24", features = ["fltk-bundled"] }
-fltk-sys = "1.4.23"
+#fltk = { version = "1.4.24", features = ["fltk-bundled"] }
+#fltk-sys = "1.4.23"
 crossbeam-channel = "0.5"
+fltk-sys={git="https://github.com/fltk-rs/fltk-rs.git"}
+fltk={git="https://github.com/fltk-rs/fltk-rs.git"}
 
-
+[dependencies]
+fltk = { workspace = true}
+fltk-sys = { workspace = true}
+anyhow = {workspace=true}

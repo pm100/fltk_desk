@@ -7,4 +7,6 @@ edition = "2021"
 
 [dependencies]
 fltk_desk={path=".."}
-fltk = { version = "1.4.24", features = ["fltk-bundled"] }
+fltk = { workspace = true}
+fltk-sys = { workspace = true}
+anyhow = {workspace=true}

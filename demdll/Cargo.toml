@@ -8,4 +8,4 @@ edition = "2021"
 crate-type = ["cdylib"]
 [dependencies]
 fltk_desk={path=".."}
-fltk = { version = "1.4.24", features = ["fltk-bundled"] }
+#fltk = { version = "1.4.24", features = ["fltk-bundled"] }
